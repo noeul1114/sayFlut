@@ -169,35 +169,54 @@ class MyHomePage extends StatelessWidget {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            title: Text("Say::Project"),
+            title: Center(child: Text("Say::Project", style: TextStyle(color: Colors.black),)),
             floating: true,
             snap: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(12.0),
-            sliver: SliverStaggeredGrid(
-                delegate: SliverVariableSizeChildBuilderDelegate(
-                        (context, index) => FutureBuilder(
-                            future: fetchPost(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return new _Tile(index, snapshot.data.list[index]);
-                              } else if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
-
-                              // By default, show a loading spinner
-                              return CircularProgressIndicator();
-                            })
+          FutureBuilder(
+            future: fetchPost(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) return SliverPadding(
+                padding: const EdgeInsets.all(12.0),
+                sliver: SliverStaggeredGrid(
+                  delegate: SliverVariableSizeChildBuilderDelegate(
+                          (context, index) =>
+                      new _Tile(index, snapshot.data.list[index])
+//                        (context, index) => FutureBuilder(
+//                            future: fetchPost(),
+//                            builder: (context, snapshot) {
+//                              if (snapshot.hasData) {
+//                                return new _Tile(index, snapshot.data.list[index]);
+//                              } else if (snapshot.hasError) {
+//                                return Text("${snapshot.error}");
+//                              }
+//
+//                              // By default, show a loading spinner
+//                              return CircularProgressIndicator();
+//                            }),
+                  ),
+                  gridDelegate: SliverStaggeredGridDelegateWithMaxCrossAxisExtent(
+                      staggeredTileCount: snapshot.data.list.length,
+                      maxCrossAxisExtent: 100.0,
+                      mainAxisSpacing: 0.0,
+                      crossAxisSpacing: 8.0,
+                      staggeredTileBuilder: (index) => new StaggeredTile.fit(2)
+                  ),
                 ),
-                gridDelegate: SliverStaggeredGridDelegateWithMaxCrossAxisExtent(
-                    staggeredTileCount: 2,
-                    maxCrossAxisExtent: 100.0,
-                    mainAxisSpacing: 0.0,
-                    crossAxisSpacing: 8.0,
-                    staggeredTileBuilder: (index) => new StaggeredTile.fit(2)
-                ),
-            ),
+              );
+              else if (snapshot.hasError) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Text("${snapshot.error}"),
+                  ),
+                );
+              }
+              return SliverFillRemaining(
+                child: CircularProgressIndicator(),
+              );
+            }
           )
         ],
       ),
@@ -331,9 +350,9 @@ class _Tile extends StatelessWidget {
               ],
             ),
           ),
-          Center(
-            child: Text(size.title),
-          )
+//          Center(
+//            child: Text(size.title),
+//          )
         ]
     );
   }
